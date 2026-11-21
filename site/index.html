@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mailgoose: simple email marketing, with a CLI for your AI agent</title>
+  <meta name="description" content="mailgoose designs and sends marketing email to people who asked for it, and collects subscribers with signup forms. Nothing else. Every feature also works from a CLI, so you can drive it from the AI agent you already use.">
+  <meta property="og:title" content="mailgoose: simple email marketing">
+  <meta property="og:description" content="Design an email, send it to your subscribers, collect new ones with signup forms. From the web app or from your AI agent.">
+  <meta property="og:image" content="https://mailgoose.app/assets/social.jpg">
+  <meta property="og:url" content="https://mailgoose.app/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://mailgoose.app/">
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preload" href="/assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/tokens.css">
+  <link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/"><img src="/assets/brand/wordmark.png" width="133" height="32" alt="mailgoose"></a>
+      <nav aria-label="Main">
+        <a href="#features" class="hide-sm">Features</a>
+        <a href="#sending">How we send</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <p class="badge">Invite-only beta</p>
+          <h1>Email marketing, without the platform.</h1>
+          <p class="lede">mailgoose does three things: it helps you design an email, sends it to the people who asked to hear from you, and collects new subscribers with signup forms. Everything you can do in the web app, you can also do from a command line, so the AI agent you already use can do it too.</p>
+          <div class="actions">
+            <a class="button primary" href="#sending">See how we send</a>
+            <p class="button-note">We're letting in a few small businesses and developers at a time.</p>
+          </div>
+        </div>
+        <figure class="hero-art">
+          <img src="/assets/brand/goose.png" width="539" height="880" fetchpriority="high" alt="The mailgoose mascot: a white goose in a blue mail carrier's cap, carrying a brown satchel full of letters.">
+        </figure>
+      </div>
+    </section>
+
+    <section class="band alt" id="features">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Just the five things you need</h2>
+          <p class="section-lede">No CRM, no ad manager, no website builder. A short list of features that work well.</p>
+        </div>
+        <ul class="grid">
+          <li class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></span><h3>Email designer</h3><p>Drag and drop blocks, or bring your own HTML and edit it with a live preview.</p></li>
+          <li class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span><h3>Contacts and tags</h3><p>One audience per account, organized with tags. Import a CSV or add people by hand.</p></li>
+          <li class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></span><h3>Campaigns</h3><p>Send a test, check it, then confirm to send it to everyone you picked.</p></li>
+          <li class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span><h3>Signup forms</h3><p>Copy an embed code onto your site. New subscribers confirm by email before they're added.</p></li>
+          <li class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span><h3>Reports</h3><p>Deliveries, opens, clicks, bounces and unsubscribes for each campaign.</p></li>
+          <li class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg></span><h3>A CLI for your agent</h3><p>Every action in the app has a command, so Claude, Codex or any agent can build and send for you.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" id="agents">
+      <div class="wrap split">
+        <div class="section-head">
+          <h2>Built for your AI agent, too</h2>
+          <p class="section-lede">The CLI covers everything the web app does. An agent can build an email block by block and send you a test, but a campaign only goes out after you confirm it with a one-time code.</p>
+        </div>
+        <figure class="terminal">
+          <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>Terminal</figcaption>
+<pre><code><span class="c"># sign in once</span>
+<span class="p">$ </span>mailgoose login
+
+<span class="c"># build an email from blocks, then check it</span>
+<span class="p">$ </span>mailgoose email create
+<span class="p">$ </span>mailgoose email blocks add
+<span class="p">$ </span>mailgoose email check
+
+<span class="c"># test it, then launch with your confirmation</span>
+<span class="p">$ </span>mailgoose campaign test
+<span class="p">$ </span>mailgoose campaign launch</code></pre>
+        </figure>
+      </div>
+    </section>
+
+    <section class="band alt" id="sending">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>How we keep email wanted</h2>
+          <p class="section-lede">mailgoose sends marketing email from our customers to their own subscribers: people who signed up on the customer's site or asked to hear from them. Every account agrees to our <a href="/anti-spam/">anti-spam policy</a>, and the app enforces it.</p>
+        </div>
+        <ul class="grid grid-2">
+          <li class="card"><h3>Only people who opted in</h3><p>Bought, rented, shared and scraped lists aren't allowed. Signup forms use double opt-in by default, so each new subscriber confirms by email first.</p></li>
+          <li class="card"><h3>Unsubscribe in every email</h3><p>mailgoose adds a working unsubscribe link and one-click unsubscribe header to every campaign, and honors them at once. Every email also carries the sender's postal address.</p></li>
+          <li class="card"><h3>Bounces and complaints handled</h3><p>A hard bounce or a spam complaint stops all future mail to that address straight away. Repeated soft bounces do the same.</p></li>
+          <li class="card"><h3>Accounts that misbehave are paused</h3><p>We watch each account's bounce and complaint rates and pause its sending when they climb, before they can hurt anyone else's delivery.</p></li>
+          <li class="card"><h3>New accounts are reviewed</h3><p>We review new accounts by hand during the beta, and new accounts can only send to their own test addresses until we allow more.</p></li>
+          <li class="card"><h3>Imports are checked</h3><p>Imported lists with signs of being bought or scraped are held for review before anyone on them gets email.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" id="pricing">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Simple pricing</h2>
+          <p class="section-lede">Pay for what you send. Credits you buy last two years.</p>
+        </div>
+        <ul class="grid grid-2">
+          <li class="card plan"><h3>Free</h3><p class="price">$0</p><p>Up to 500 contacts and 1,000 emails a month.</p></li>
+          <li class="card plan"><h3>Paid</h3><p class="price">$5 <small>a month</small></p><p>Or $50 a year, for your first 2,500 contacts, plus credit packs for the email you send.</p></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>&copy; 2026 Gremlin Technologies LLC. mailgoose is a Gremlin Technologies product.</p>
+      <ul aria-label="Policies">
+        <li><a href="/terms/">Terms of service</a></li>
+        <li><a href="/privacy/">Privacy policy</a></li>
+        <li><a href="/anti-spam/">Anti-spam policy</a></li>
+        <li><a href="/dpa/">Data processing agreement</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

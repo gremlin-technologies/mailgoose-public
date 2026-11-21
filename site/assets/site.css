@@ -1,0 +1,365 @@
+/* mailgoose.app: the public site. Plain CSS, no build step.
+ *
+ * It looks like the web app on purpose. The colors, shadows, radii and type
+ * come from tokens.css, which scripts/site/tokens.mjs copies from the app's
+ * web/src/styles.css; this file only lays them out. The rules are the app's
+ * (docs/design-system.md): white pages, near-black text, the blue only for
+ * actions and state, depth from a hairline plus a soft shadow, 120ms color
+ * changes on hover and focus, nothing that moves.
+ */
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem; /* in-page links land below the sticky header */
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 0.15em; }
+
+/* A link inside running text is underlined, so it doesn't rely on color
+   alone (WCAG 1.4.1), as in the app. */
+p a, li a { text-decoration: underline; text-underline-offset: 0.15em; }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.wrap { max-width: 68rem; margin: 0 auto; padding: 0 1.5rem; }
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.5rem 0.875rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+/* The shadow comes with focus, so none of it shows above the header. */
+.skip:focus { top: 0.75rem; box-shadow: var(--shadow-pop); }
+
+/* Everything that changes on hover or focus eases the same way. */
+.button,
+.site-header nav a,
+.site-footer a {
+  transition: background-color var(--ease), border-color var(--ease), box-shadow var(--ease), color var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* The wordmark: the goose head and the word, as in the app's side menu. A
+   <picture> swaps in the light-text version in dark mode. */
+.brand { display: inline-flex; align-items: center; text-decoration: none; }
+.brand:hover { text-decoration: none; }
+.brand img { display: block; height: 2rem; width: auto; }
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4rem;
+}
+.site-header nav { display: flex; align-items: center; gap: 0.25rem; }
+.site-header nav a {
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.site-header nav a:hover { color: var(--text); background: var(--surface-hover); text-decoration: none; }
+
+/* Buttons: the app's .button and .button.primary, a size up for a landing page. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.125rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-button);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  text-decoration: none;
+}
+.button:hover { background: var(--surface-hover); text-decoration: none; }
+.button.primary { background: var(--accent); color: var(--accent-text); box-shadow: var(--shadow-button-primary); }
+.button.primary:hover { background: var(--accent-hover); }
+
+/* Badges: the app's .badge-info. */
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+/* Type */
+h1, h2, h3 { color: var(--text); font-weight: 600; }
+h1 {
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 3.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+h2 {
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.75rem;
+  text-wrap: balance;
+}
+h3 { font-size: 1rem; line-height: 1.4; letter-spacing: -0.01em; margin: 0 0 0.375rem; }
+.muted { color: var(--muted); }
+
+/* Hero */
+.hero { padding: 4.5rem 0 5rem; }
+.hero .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 3.5rem;
+  align-items: center;
+}
+.hero .badge { margin: 0 0 1.25rem; }
+.lede {
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--muted);
+  margin: 0 0 2rem;
+  max-width: 34em;
+}
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; }
+.button-note { font-size: 0.875rem; color: var(--muted); margin: 0; }
+.hero-art {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  box-shadow: var(--shadow-card);
+}
+.hero-art img { width: auto; max-height: 26rem; }
+
+/* Sections */
+.band { padding: 5rem 0; border-top: 1px solid var(--border); }
+.band.alt { background: var(--surface-subtle); }
+.section-head { max-width: 42rem; margin: 0 0 2.5rem; }
+.section-lede { margin: 0; font-size: 1.0625rem; color: var(--muted); }
+
+/* Cards: a hairline plus a soft shadow, as in the app. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem 1.5rem 1.375rem;
+}
+.card p { margin: 0; color: var(--muted); font-size: 0.9375rem; }
+
+/* Feature icons: Lucide outlines, the ones the app's side menu uses. */
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0 0 0.875rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-soft-text);
+}
+.icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The agent section: copy beside a terminal window. */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 3.5rem;
+  align-items: center;
+}
+.split .section-head { margin: 0; }
+.terminal {
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-subtle);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.terminal-bar span[aria-hidden] {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.terminal-bar span[aria-hidden]:last-of-type { margin-right: 0.5rem; }
+.terminal pre {
+  margin: 0;
+  padding: 1.125rem 1.25rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+.terminal .c { color: var(--muted); }
+.terminal .p { color: var(--accent); user-select: none; }
+
+/* Pricing: the app's tiles, larger. */
+.plan .price {
+  margin: 0.5rem 0 0.75rem;
+  color: var(--text);
+  font-size: 2.25rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.plan .price small {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+/* Footer */
+.site-footer {
+  padding: 2.5rem 0 3rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface-subtle);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.site-footer .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+}
+.site-footer p { margin: 0; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+.site-footer a { color: var(--muted); text-decoration: none; }
+.site-footer a:hover { color: var(--text); text-decoration: underline; }
+.site-footer p a { text-decoration: underline; text-underline-offset: 0.15em; }
+
+/* Policy pages and the 404: one reading column, like the app's policy pages. */
+.policy { max-width: 46rem; margin: 0 auto; padding: 3.5rem 1.5rem 4.5rem; }
+.policy h1 { font-size: clamp(1.875rem, 1.5rem + 1.6vw, 2.5rem); margin-bottom: 0.75rem; }
+.policy h2 { font-size: 1.125rem; letter-spacing: -0.01em; margin: 2.25rem 0 0.5rem; }
+.policy ul { margin: 0; padding-left: 1.25rem; }
+.policy li { margin: 0.25rem 0; }
+.policy-version { margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--muted); }
+/* The app's .notice-warn: a soft fill, no icon, no border. */
+.notice {
+  margin: 0 0 1.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  font-size: 0.9375rem;
+}
+.notice p { margin: 0; }
+.policy-nav {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.policy-nav ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.875rem; }
+.policy-nav li { margin: 0; }
+.policy-nav a { text-decoration: none; }
+.policy-nav a:hover { text-decoration: underline; }
+.policy-nav [aria-current="page"] { color: var(--muted); }
+
+.lost { text-align: center; }
+.lost img {
+  width: auto;
+  height: 14rem;
+  margin: 0 auto 2rem;
+}
+
+/* Small screens */
+@media (max-width: 860px) {
+  .hero { padding: 2.5rem 0 3.5rem; }
+  .hero .wrap, .split { grid-template-columns: 1fr; gap: 2.5rem; }
+  .hero-art { order: -1; padding: 1.5rem; }
+  .hero-art img { max-height: 16rem; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .band { padding: 3.5rem 0; }
+  .section-head { margin-bottom: 2rem; }
+}
+
+@media (max-width: 600px) {
+  .wrap { padding: 0 1rem; }
+  .grid, .grid-2 { grid-template-columns: 1fr; }
+  .site-header nav a { padding: 0.375rem 0.5rem; }
+  .policy { padding: 2.5rem 1rem 3.5rem; }
+}
+
+@media (max-width: 420px) {
+  .site-header nav .hide-sm { display: none; }
+}

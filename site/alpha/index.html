@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alpha tester guide | mailgoose</title>
+  <meta name="description" content="How to get a mailgoose tester account on staging, and how to test each part of the app and the CLI.">
+  <!-- Unlisted: shared with invited testers only, so search engines skip it. -->
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://mailgoose.app/alpha/">
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preload" href="/assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/tokens.css">
+  <link rel="stylesheet" href="/assets/site.css">
+  <style>
+    /* The guide's own layout, on top of site.css and the app's tokens: a
+       reading column beside a sticky table of contents. Light only, like the
+       rest of the site. */
+    .guide-hero { padding: 3.5rem 0 3rem; border-bottom: 1px solid var(--border); background: var(--surface-subtle); }
+    .guide-hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2.5rem; align-items: center; }
+    .guide-hero h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); margin-bottom: 1rem; }
+    .guide-hero .badge { margin: 0 0 1rem; }
+    .guide-hero .lede { margin-bottom: 0; }
+    .guide-hero figure { margin: 0; }
+    .guide-hero img { width: auto; height: 11rem; }
+
+    .guide { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 3.5rem; padding-top: 2.5rem; padding-bottom: 5rem; }
+
+    /* Table of contents */
+    .toc { position: sticky; top: 5rem; align-self: start; max-height: calc(100vh - 6rem); overflow-y: auto; font-size: 0.875rem; }
+    .toc summary { display: none; }
+    .toc-title { margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    .toc ol { list-style: none; margin: 0; padding: 0; }
+    .toc li { margin: 0; }
+    .toc a {
+      display: block;
+      padding: 0.3125rem 0.75rem;
+      border-left: 2px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      transition: color var(--ease), border-color var(--ease), background-color var(--ease);
+    }
+    .toc a:hover { color: var(--text); background: var(--surface-hover); text-decoration: none; }
+    .toc a[aria-current="true"] { color: var(--accent); border-left-color: var(--accent); font-weight: 500; }
+    .toc .toc-group { margin: 1rem 0 0.25rem; padding-left: 0.875rem; font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+
+    /* Reading column */
+    .content { max-width: 46rem; }
+    .content > section { padding: 0 0 2.75rem; margin: 0 0 2.75rem; border-bottom: 1px solid var(--border); }
+    .content > section:last-child { border-bottom: 0; margin-bottom: 0; }
+    .content h2 { margin-bottom: 0.875rem; }
+    .content h3 { margin: 1.75rem 0 0.5rem; font-size: 1rem; }
+    .content p { margin: 0 0 1rem; }
+    .content ul, .content ol { margin: 0 0 1rem; padding-left: 1.375rem; }
+    .content li { margin: 0.3125rem 0; }
+    .content li > ul { margin: 0.25rem 0 0; }
+    .eyebrow { margin: 0 0 0.375rem; font-size: 0.8125rem; font-weight: 500; color: var(--accent); }
+    .where { margin: -0.25rem 0 1.25rem; font-size: 0.875rem; color: var(--muted); }
+    .where code { font-size: 0.8125rem; }
+
+    /* Each part of a test area gets a small heading with an icon. */
+    .part { margin: 1.5rem 0 0; }
+    .part > h3 { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.5rem; }
+    .part > h3 svg { flex: none; width: 18px; height: 18px; fill: none; stroke: var(--accent); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .part.good > h3 svg { stroke: var(--good-text); }
+    .part.edge > h3 svg { stroke: var(--warn-text); }
+
+    /* Inline code, keys and commands */
+    :not(pre) > code {
+      padding: 0.0625rem 0.3125rem;
+      border-radius: 4px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      font-size: 0.875em;
+      overflow-wrap: anywhere;
+    }
+    .terminal { margin: 0 0 1.25rem; }
+    .terminal pre { font-size: 0.8125rem; line-height: 1.7; }
+
+    /* Callouts: the app's notices. */
+    .callout { margin: 0 0 1.25rem; padding: 0.875rem 1rem; border-radius: var(--radius); font-size: 0.9375rem; }
+    .callout p { margin: 0; }
+    .callout p + p { margin-top: 0.5rem; }
+    .callout.tip { background: var(--accent-soft); color: var(--accent-soft-text); }
+    .callout.warn { background: var(--warn-bg); color: var(--warn-text); }
+    .callout.stop { background: var(--error-bg); color: var(--error-text); }
+    .callout a { color: inherit; }
+
+    /* Tables: the limits */
+    .table-wrap { margin: 0 0 1.25rem; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+    th, td { padding: 0.625rem 1rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+    thead th { background: var(--surface-subtle); font-size: 0.8125rem; font-weight: 600; color: var(--muted); }
+    tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+    tbody th { font-weight: 500; white-space: nowrap; }
+    td { color: var(--muted); }
+
+    /* The quick start: numbered cards */
+    .steps { list-style: none; counter-reset: step; padding: 0 !important; display: grid; gap: 0.625rem; }
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      margin: 0;
+      padding: 0.875rem 1rem 0.875rem 3.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 1rem;
+      top: 0.875rem;
+      display: grid;
+      place-items: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent-soft-text);
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+    .steps strong { color: var(--text); }
+    .steps span { display: block; color: var(--muted); font-size: 0.9375rem; }
+
+    .soon { display: inline-block; margin-left: 0.375rem; padding: 0 0.5rem; border-radius: 999px; background: var(--warn-bg); color: var(--warn-text); font-size: 0.75rem; font-weight: 500; line-height: 1.375rem; vertical-align: 0.15em; }
+
+    .dont { list-style: none; padding: 0 !important; }
+    .dont li { position: relative; padding-left: 1.75rem; }
+    .dont li::before { content: "\00D7"; position: absolute; left: 0.125rem; top: -0.0625rem; color: var(--danger); font-size: 1.25rem; font-weight: 600; line-height: 1.6; }
+
+    .to-top { display: inline-block; margin-top: 0.5rem; font-size: 0.875rem; }
+
+    @media (max-width: 960px) {
+      .guide { grid-template-columns: 1fr; gap: 1.5rem; padding-top: 1.5rem; }
+      .toc {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow-card);
+      }
+      .toc summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 2.75rem;
+        padding: 0.625rem 1rem;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--text);
+        list-style: none;
+      }
+      .toc summary::-webkit-details-marker { display: none; }
+      .toc summary::after { content: ""; width: 0.5rem; height: 0.5rem; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-0.125rem); }
+      .toc[open] summary::after { transform: rotate(-135deg) translateY(-0.125rem); }
+      .toc[open] summary { border-bottom: 1px solid var(--border); }
+      .toc nav { padding: 0.75rem 0.5rem 0.75rem; }
+      .toc-title { display: none; }
+      .toc a { padding: 0.5rem 0.75rem; }
+      .guide-hero .wrap { grid-template-columns: 1fr; }
+      .guide-hero figure { display: none; }
+    }
+    @media (max-width: 600px) {
+      .guide-hero { padding: 2.25rem 0 2rem; }
+      th, td { padding: 0.5rem 0.75rem; }
+      tbody th { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/"><img src="/assets/brand/wordmark.png" width="133" height="32" alt="mailgoose"></a>
+      <nav aria-label="Main">
+        <a href="https://app.staging.mailgoose.app/">Open the staging app</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="guide-hero">
+      <div class="wrap">
+        <div>
+          <p class="badge">Alpha tester guide</p>
+          <h1>Help us test mailgoose.</h1>
+          <p class="lede">Thanks for trying mailgoose before anyone else. This guide gets you a tester account, then walks through each part of the app and the CLI: what it does, how to test it, what it should do, and the edge cases we'd love you to poke at.</p>
+        </div>
+        <figure>
+          <img src="/assets/brand/goose.png" width="539" height="880" alt="">
+        </figure>
+      </div>
+    </div>
+
+    <div class="wrap guide">
+      <details class="toc" open>
+        <summary>On this page</summary>
+        <nav aria-label="On this page">
+          <p class="toc-title">On this page</p>
+          <ol>
+            <li><a href="#welcome">Welcome</a></li>
+            <li><a href="#account">Get your account</a></li>
+            <li><a href="#quick-start">Quick start</a></li>
+            <li class="toc-group" aria-hidden="true">Test each area</li>
+            <li><a href="#sign-in">Signing in</a></li>
+            <li><a href="#settings">Settings</a></li>
+            <li><a href="#sending-from">Where your email comes from</a></li>
+            <li><a href="#designer">Block designer</a></li>
+            <li><a href="#html">HTML emails</a></li>
+            <li><a href="#contacts">Contacts and tags</a></li>
+            <li><a href="#imports">Importing contacts</a></li>
+            <li><a href="#forms">Signup forms</a></li>
+            <li><a href="#campaigns">Campaigns</a></li>
+            <li><a href="#reports">Reports, bounces and unsubscribes</a></li>
+            <li><a href="#api-keys">API keys</a></li>
+            <li><a href="#cli">The CLI</a></li>
+            <li><a href="#agents">Using it from an AI agent</a></li>
+            <li><a href="#billing">Credits and billing</a></li>
+            <li class="toc-group" aria-hidden="true">And finally</li>
+            <li><a href="#coming-soon">Coming soon</a></li>
+            <li><a href="#bugs">Reporting a bug</a></li>
+            <li><a href="#please-dont">Please don't</a></li>
+          </ol>
+        </nav>
+      </details>
+
+      <div class="content">
+        <section id="welcome" aria-labelledby="welcome-h">
+          <h2 id="welcome-h">Welcome</h2>
+          <p>mailgoose is a deliberately small email marketing app. It does three things: you design an email, send it to people who asked to hear from you, and collect new subscribers with signup forms. Everything the web app does, the <code>mailgoose</code> CLI does too, so you can hand the work to whichever AI agent you already use.</p>
+          <p><strong>Alpha means it's early.</strong> You'll be using our staging environment, not the finished product. Expect rough edges, things that change from one day to the next, and the odd outright bug. That's the point: every bug you find now is one a customer never sees.</p>
+          <ul>
+            <li><strong>The app:</strong> <a href="https://app.staging.mailgoose.app/">app.staging.mailgoose.app</a></li>
+            <li><strong>The API, for the CLI:</strong> <code>https://api.staging.mailgoose.app</code></li>
+            <li><strong>Your data may be wiped.</strong> Staging is a test environment. Don't keep anything there you can't recreate.</li>
+          </ul>
+          <div class="callout tip">
+            <p>You don't need to test everything. Pick the areas you'd actually use, follow their steps, and tell us whatever surprised, confused or annoyed you. "This button label made no sense" is as useful to us as a crash.</p>
+          </div>
+        </section>
+
+        <section id="account" aria-labelledby="account-h">
+          <h2 id="account-h">Get your account</h2>
+          <ol>
+            <li><strong>Sign up</strong> at <a href="https://app.staging.mailgoose.app/signup">app.staging.mailgoose.app/signup</a> with the email address your invite went to. We email you a six-digit code; type it in and you're signed in. There are no passwords.</li>
+            <li><strong>Wait for review.</strong> Every new account is reviewed by hand, so you'll see a yellow banner saying so. Meanwhile you can build emails, import contacts and send yourself tests. Launching campaigns and taking form signups open once the review is done.</li>
+            <li><strong>Get your tester account.</strong> Once we've approved you, we turn your account into a tester account. A banner across the app then shows how many tester credits you have left and when your tester account ends.</li>
+          </ol>
+          <p>If a day goes by and your account is still in review, say so in <strong>#user-feedback</strong> in the team Slack and we'll sort it out.</p>
+
+          <h3>What a tester account can do</h3>
+          <p>A tester account sends real campaigns to real people (people who agreed to get them), within some limits that keep staging safe for everyone:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Limit</th><th scope="col">What it means</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">500 credits</th><td>For the life of the tester account. Each campaign copy and each test send uses one. A copy that fails or is skipped gives its credit back.</td></tr>
+                <tr><th scope="row">30 days</th><td>After that the account can't test or launch. Ask us if you need longer.</td></tr>
+                <tr><th scope="row">500 contacts</th><td>Adding or importing stops there.</td></tr>
+                <tr><th scope="row">100 a day</th><td>At most 100 campaign copies in a day.</td></tr>
+                <tr><th scope="row">50 tests a day</th><td>Test sends, in any 24 hours.</td></tr>
+                <tr><th scope="row">A stricter pause</th><td>Two spam complaints on one campaign, or a high hard-bounce rate, pauses the campaign and the account. We look, and unpause it if it was a false alarm.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout tip">
+            <p><strong>Free practice addresses.</strong> Sends to Amazon's mailbox simulator, such as <code>success@simulator.amazonses.com</code>, use no tester credits and never count against your bounce or complaint rates. They're the safe way to see what a bounce or a complaint does. See <a href="#reports">Reports, bounces and unsubscribes</a>.</p>
+          </div>
+
+          <h3>Test mode, if you see it</h3>
+          <p>New accounts start in <strong>test mode</strong> until we switch them over. In test mode, campaigns, tests and form signups reach only your own sign-in address and up to five <strong>test addresses</strong> you've confirmed. Add them on the Test addresses page (linked from the test mode notice) or with <code>mailgoose test-addresses add</code>; each one gets a link to click. A launch to anyone else is refused with <code>test_mode</code>. That's expected, not a bug.</p>
+        </section>
+
+        <section id="quick-start" aria-labelledby="quick-start-h">
+          <h2 id="quick-start-h">Quick start: your first campaign</h2>
+          <p>The Dashboard has the same five steps as a checklist, and ticks each one off as you go. Budget about 15 minutes.</p>
+          <ol class="steps">
+            <li><strong>Fill in Settings.</strong><span>Your postal address (every email needs one by law) and your default From name and address.</span></li>
+            <li><strong>Sort out where your email comes from.</strong><span>Verify a domain of your own, or confirm a sender address. See <a href="#sending-from">Where your email comes from</a>.</span></li>
+            <li><strong>Add a few contacts.</strong><span>Yourself, a second address of yours, and a simulator address or two.</span></li>
+            <li><strong>Build an email</strong><span>with blocks, or paste your own HTML.</span></li>
+            <li><strong>Make a campaign, send a test, then launch it.</strong><span>Check the test in your inbox first. Then open the report.</span></li>
+          </ol>
+        </section>
+
+        <section id="sign-in" aria-labelledby="sign-in-h">
+          <p class="eyebrow">Area 1</p>
+          <h2 id="sign-in-h">Signing in</h2>
+          <p class="where">Where: the sign-in page, and <code>mailgoose login</code></p>
+          <p>mailgoose has no passwords. You sign in with a six-digit code we email you, and you stay signed in for 30 days. The CLI signs in through the browser: it shows a short code, and you approve it on a page in the app.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Sign out (under your address in the side menu), then sign in again.</li>
+              <li>Sign in on a second browser or your phone at the same time.</li>
+              <li>Open the app in a private window and go straight to a page like <code>/campaigns</code>.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The code arrives within a minute, works once, and the email clearly comes from mailgoose.</li>
+              <li>A private window sends you to sign in first, then back to the page you asked for.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>A wrong code, a code typed with spaces, and an old code after you've asked for a new one.</li>
+              <li>Five wrong codes in a row (it should stop accepting that code).</li>
+              <li>Signing in with an address that has no account: you'll see the same message as for a real one, but no email. That's on purpose, so the form can't be used to find out who has an account.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="settings" aria-labelledby="settings-h">
+          <p class="eyebrow">Area 2</p>
+          <h2 id="settings-h">Settings</h2>
+          <p class="where">Where: Settings in the side menu, and <code>mailgoose account get</code> / <code>account update</code></p>
+          <p>Your account's name, the default From name and address for new emails, the postal address that goes in every email's footer, your time zone (scheduled sends use it), dark mode, and deleting the account.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Fill in every field and save. Reload and check it all stuck.</li>
+              <li>Turn on <strong>Dark mode</strong> under Appearance. Walk through every page and the email designer looking for text you can't read.</li>
+              <li>Change your time zone, then schedule a campaign and check the time it shows.</li>
+              <li>Run <code>mailgoose account get</code> and check it matches the page.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>Your postal address shows in the footer of every test email you send.</li>
+              <li>Dark mode applies everywhere at once, other open tabs follow it, and it stays on after a reload. It's kept per browser, so a second browser starts light.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>A very long account name, accents and emoji, and a postal address with many lines.</li>
+              <li>Removing the postal address, then trying to send a test (it should refuse, and say why).</li>
+              <li>Deleting the account asks you to type its exact name. Please only try this on a second, throwaway account: deletion is immediate and can't be undone.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="sending-from" aria-labelledby="sending-from-h">
+          <p class="eyebrow">Area 3</p>
+          <h2 id="sending-from-h">Where your email comes from</h2>
+          <p class="where">Where: Domains, Settings, and <code>mailgoose domain</code> / <code>sender-addresses</code></p>
+          <p>Every email needs a From address that you've proved is yours. There are two ways to do that.</p>
+          <ul>
+            <li><strong>Your own domain (recommended).</strong> Add a domain on the Domains page and put the DNS records it shows at your DNS host. mailgoose checks them every few minutes and marks the domain verified once they're all found. Then you can send from any address at that domain.</li>
+            <li><strong>A sender address on mailgoose's shared domain.</strong> No DNS needed: you confirm an address you own (your sign-in address counts already) and your email goes from your account's address on mailgoose's shared sending domain, with replies to you. <span class="soon">Rolling out on staging</span></li>
+          </ul>
+          <div class="callout warn">
+            <p><strong>Why we push you toward your own domain.</strong> Inbox providers judge mail partly by the domain it comes from. On your own domain you build your own reputation, your readers see your name, and nobody else's sending can drag you down. On a shared domain you share all of that with every other sender. The app nudges you about this on purpose; we'd love to hear whether the nudge feels helpful or naggy.</p>
+          </div>
+          <p>The shared domain is switched on per server. If Settings or <code>mailgoose account get</code> shows a <strong>Shared From</strong>, it's on for you; if not, add your own domain for now.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Add a subdomain you control, such as <code>news.yourdomain.com</code>, so you don't touch the DNS your main email uses.</li>
+              <li>Copy each record into your DNS host with the copy buttons, then press <strong>Check now</strong> (or <code>mailgoose domain verify news.yourdomain.com</code>).</li>
+              <li>Once it's verified, set your From to an address on it and send yourself a test. In your mail app, look at the message details for SPF, DKIM and DMARC.</li>
+              <li>If the shared domain is on: add a second address you own as a sender address, click the link in its email, then send a test from it and reply to the test.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The domain turns verified within a few minutes of the records going in, and each record says whether it was found.</li>
+              <li>Your test passes SPF and DKIM. A brand-new domain landing in spam at first is normal, and worth telling us about anyway.</li>
+              <li>On the shared domain, the test says it's sending from mailgoose's shared domain with replies to you, and replying reaches your own inbox.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>One record missing or mistyped: does the page tell you which one?</li>
+              <li>A From on a domain you haven't verified (it should be refused with <code>unverified_from</code> and a clear fix).</li>
+              <li>A Reply-To that isn't verified, on the shared domain (refused with <code>unverified_reply_to</code>).</li>
+              <li>A sender address link opened twice, or after it expired (links last 7 days), and an 11th sender address (the limit is 10).</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="designer" aria-labelledby="designer-h">
+          <p class="eyebrow">Area 4</p>
+          <h2 id="designer-h">The block designer</h2>
+          <p class="where">Where: Emails &gt; New email, and <code>mailgoose email blocks</code></p>
+          <p>Build an email from blocks: headings, text, images, buttons, dividers, spacers, two columns and social links. You type headings, text and button labels right on the email, with a small formatting toolbar for bold, italics and links. Drag blocks to reorder them; they snap into the nearest gap. The footer, with the unsubscribe link and your postal address, is added for you. Everything saves as you go, and <strong>Save and exit</strong> takes you back when you're done.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Make a new email and add one of every block type. Upload a picture for the image block, and give it alt text.</li>
+              <li>Put an image and a button side by side in a columns block.</li>
+              <li>Use a merge tag in a text block, such as <code>{{first_name|there}}</code> (the part after <code>|</code> is used when a contact has no first name).</li>
+              <li>Drag blocks around, reload the page, then press <strong>Save and exit</strong>.</li>
+              <li>Open the preview, then press <strong>Check email</strong> and read what it says.</li>
+              <li>Send a test and open it on your phone and in a desktop mail app.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>What you see in the designer is what arrives in the inbox, on a phone too.</li>
+              <li>The save state reads "All changes saved" a moment after you stop typing, and nothing is lost on reload.</li>
+              <li>The check lists errors that stop a send (no subject, no postal address, a From you haven't verified) apart from warnings worth a look (such as an image without alt text).</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>The same email open in two tabs, edited in both. You should be told about the conflict, never lose an edit silently.</li>
+              <li>Pasting formatted text from a web page or a word processor.</li>
+              <li>A merge tag with a typo, like <code>{{frist_name}}</code>.</li>
+              <li>A huge picture, a non-image file, and a button with no link.</li>
+              <li>Using the designer with only a keyboard, and on a tablet.</li>
+              <li>Going offline for a moment while editing, then coming back.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="html" aria-labelledby="html-h">
+          <p class="eyebrow">Area 5</p>
+          <h2 id="html-h">HTML emails</h2>
+          <p class="where">Where: Emails &gt; New email &gt; your own HTML, and <code>mailgoose email import-html</code></p>
+          <p>Already have an email you like? Bring the HTML. You edit it in a code editor with a live preview beside it. mailgoose checks the markup and lists every problem with its line. It must include <code>{{unsubscribe_url}}</code> somewhere, so readers can always leave.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Paste in an email you've sent before from another tool, or a free template.</li>
+              <li>Add <code>{{unsubscribe_url}}</code> as a link's address, then send yourself a test.</li>
+              <li>Duplicate the email from the Emails list and change the copy.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The preview keeps up as you type, and the test looks like the preview.</li>
+              <li>Problems point at the right line, in words you can act on.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>HTML without <code>{{unsubscribe_url}}</code>, and HTML with a <code>&lt;script&gt;</code> or a form in it.</li>
+              <li>Broken markup: an unclosed tag, a stray <code>&lt;/div&gt;</code>.</li>
+              <li>A very large email, and one with images linked from another site.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="contacts" aria-labelledby="contacts-h">
+          <p class="eyebrow">Area 6</p>
+          <h2 id="contacts-h">Contacts and tags</h2>
+          <p class="where">Where: Contacts and Tags, and <code>mailgoose contacts</code> / <code>tags</code> / <code>export</code></p>
+          <p>Each account has one list of contacts. You group them with tags and send a campaign to everyone, or to the contacts with certain tags. Each contact is subscribed, unconfirmed (hasn't confirmed by email yet), unsubscribed, bounced or complained, and only subscribed contacts get campaigns.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Add a few contacts by hand, with and without names.</li>
+              <li>Make two tags, put them on different contacts, then rename one and delete the other.</li>
+              <li>Search the list and filter it by tag and status, then open a contact to see its details and where it came from.</li>
+              <li>Export your contacts to CSV, and download one contact's data (<code>mailgoose contacts export-data</code>).</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>Tag counts match the contacts you tagged, and a renamed tag stays on its contacts.</li>
+              <li>The export opens cleanly in a spreadsheet, and importing it again gives the same contacts and tags.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>The same address twice, in different capitals, and an address with a typo like <code>gmial.com</code>.</li>
+              <li>Changing an unsubscribed contact back to subscribed. It's refused on purpose: only the person can resubscribe, through a signup form. Tell us how that feels.</li>
+              <li>Deleting a tag that a draft campaign sends to.</li>
+              <li>Your 501st contact (the tester limit is 500).</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="imports" aria-labelledby="imports-h">
+          <p class="eyebrow">Area 7</p>
+          <h2 id="imports-h">Importing contacts</h2>
+          <p class="where">Where: Contacts &gt; Import, and <code>mailgoose import</code></p>
+          <p>Upload a CSV. mailgoose finds the email and name columns from common headers (a Mailchimp audience export works as it is), asks where the people came from, and keeps that as each contact's consent record. Unless you say you have their permission, imported contacts start unconfirmed and get a confirmation email first. Imports that look bought or scraped are held for review.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Make a small CSV of addresses you own (or simulator addresses), with an <code>Email Address</code> and a <code>First Name</code> column.</li>
+              <li>Import it, saying honestly where the people came from, and watch the import's page until it finishes.</li>
+              <li>Add a <code>tags</code> column and import again.</li>
+              <li>Try the same from the CLI: <code>mailgoose import contacts.csv --list-source personal --wait</code>.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The result counts what was added and lists every skipped row with the reason.</li>
+              <li>Without the permission box ticked, new contacts are unconfirmed and get a confirmation email.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>Semicolons or tabs instead of commas, a file saved from Excel, and accents in names.</li>
+              <li>Bad addresses, repeated rows, addresses already in your list, and an empty file.</li>
+              <li>A file with odd column names, mapped by hand (<code>--map email="E-mail"</code>).</li>
+              <li>A file that's not a CSV at all.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="forms" aria-labelledby="forms-h">
+          <p class="eyebrow">Area 8</p>
+          <h2 id="forms-h">Signup forms</h2>
+          <p class="where">Where: Signup forms, and <code>mailgoose form</code></p>
+          <p>Make a form that asks for an email (and a name, if you like), tags everyone who signs up, and gives you embed code to paste into your site. Double opt-in is on by default: people get an email and are only subscribed once they click to confirm.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Make a form with a first name field and a tag. Change the button text and the success message.</li>
+              <li>Copy the embed code into a page of your own site, or into a blank <code>.html</code> file you open in your browser.</li>
+              <li>Sign up through it with a second address of yours, then click the link in the confirmation email.</li>
+              <li>Check the new contact: subscribed, tagged, and its signup recorded.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The form fits in with your site, works on a phone, and can be filled in with a keyboard.</li>
+              <li>The contact stays unconfirmed until the button on the confirm page is pressed.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>Signing up twice with the same address, and with an address that's already unsubscribed. The form says the same thing either way, so it can't reveal who's on your list; only one confirmation email goes out per hour.</li>
+              <li>A form with double opt-in turned off, and one that redirects to a thank-you page of yours.</li>
+              <li>Submitting the instant the page loads, or with a required field empty.</li>
+              <li>A form while your account is still in review or in test mode (signups should be refused, or limited to your test addresses).</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="campaigns" aria-labelledby="campaigns-h">
+          <p class="eyebrow">Area 9</p>
+          <h2 id="campaigns-h">Campaigns</h2>
+          <p class="where">Where: Campaigns, and <code>mailgoose campaign</code></p>
+          <p>A campaign is an email, who gets it (everyone subscribed, or contacts with certain tags) and when (now, or a time you pick). Before you can launch, you send a test of the campaign exactly as it is. Launching shows a summary (subject, From, how many people, when, and the credits it uses) and only sends once you confirm.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Make a campaign to one tag. Check the recipient count is what you expect.</li>
+              <li>Send a test to yourself, and to a second address on your verified domain if you have one. The subject starts with <code>[Test]</code>.</li>
+              <li>Press <strong>Review and launch</strong>, read the summary, and confirm.</li>
+              <li>Make a second campaign scheduled for 15 minutes from now. Move its send time, then let it go.</li>
+              <li>Make a third, schedule it, and cancel it before it sends.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The summary's numbers match what actually goes out, and the credits used match the copies sent.</li>
+              <li>The scheduled campaign goes at the time you picked, in your time zone.</li>
+              <li>Every copy has a working unsubscribe link and your postal address.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>Change the email after testing, then try to launch. It should ask for a fresh test.</li>
+              <li>A campaign to a tag nobody has, and one bigger than your credits or your 100-a-day cap.</li>
+              <li>A send time in the past, or across a daylight saving change.</li>
+              <li>Two tabs launching the same campaign at once.</li>
+              <li>Deleting the email a draft campaign uses.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="reports" aria-labelledby="reports-h">
+          <p class="eyebrow">Area 10</p>
+          <h2 id="reports-h">Reports, bounces and unsubscribes</h2>
+          <p class="where">Where: a sent campaign's Report, and <code>mailgoose campaign report</code></p>
+          <p>Each campaign's report shows sent, delivered, bounced, complaints, unsubscribes, opens and clicks, plus clicks per link. Opens are estimates: many mail apps load images on their own, and some never do. A hard bounce or a spam complaint stops all future mail to that address straight away.</p>
+          <p>To see bounces and complaints without hurting anyone's reputation, use Amazon's mailbox simulator. Add these as contacts, tag them, and send them a campaign. They use no tester credits and are left out of your rates:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Address</th><th scope="col">What it does</th></tr></thead>
+              <tbody>
+                <tr><th scope="row"><code>success@simulator.amazonses.com</code></th><td>Delivered.</td></tr>
+                <tr><th scope="row"><code>bounce@simulator.amazonses.com</code></th><td>A hard bounce. The contact becomes bounced.</td></tr>
+                <tr><th scope="row"><code>complaint@simulator.amazonses.com</code></th><td>Delivered, then marked as spam. The contact becomes complained.</td></tr>
+                <tr><th scope="row"><code>ooto@simulator.amazonses.com</code></th><td>Delivered, with an out-of-office reply.</td></tr>
+                <tr><th scope="row"><code>suppressionlist@simulator.amazonses.com</code></th><td>Refused, as if the address were on a suppression list.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Send a campaign to yourself and the simulator addresses. Open your copy and click a link in it.</li>
+              <li>Watch the report fill in over the next few minutes.</li>
+              <li>Click the unsubscribe link in your copy, then check your contact's status.</li>
+              <li>Check the simulator contacts' statuses changed as the table says.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>Every number adds up, and your click shows against the right link.</li>
+              <li>Unsubscribing takes one click, says it worked, and the next campaign skips you.</li>
+              <li>The bounced and complained contacts don't get your next campaign.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>A campaign with open and click tracking turned off (a box when you make the campaign): what does its report show for opens and clicks?</li>
+              <li>Unsubscribing twice, and using your mail app's own unsubscribe button (Gmail and Apple Mail show one).</li>
+              <li>Forwarding your copy to someone and having them unsubscribe.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="api-keys" aria-labelledby="api-keys-h">
+          <p class="eyebrow">Area 11</p>
+          <h2 id="api-keys-h">API keys</h2>
+          <p class="where">Where: API keys, and <code>mailgoose keys</code></p>
+          <p>Keys let scripts and AI agents use your account. A <strong>draft</strong> key can do everything except launch or cancel campaigns, change billing and manage keys, which suits an agent that builds and tests while you do the launching. A <strong>full</strong> key can do everything. A key's secret is shown once.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Make a draft key and a full key.</li>
+              <li>With the draft key, try to launch a campaign from the CLI: it should be refused with <code>insufficient_scope</code>.</li>
+              <li>Revoke a key, then use it again.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>A revoked key stops working on its very next request.</li>
+              <li>It's clear, without reading docs, which kind of key to make.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="cli" aria-labelledby="cli-h">
+          <p class="eyebrow">Area 12</p>
+          <h2 id="cli-h">The CLI</h2>
+          <p class="where">Where: your terminal, on macOS, Linux or Windows</p>
+          <p>Every action in the web app has a <code>mailgoose</code> command. Add <code>--json</code> to any of them for output a script or an agent can read. Nothing prompts: anything that sends or deletes waits for an explicit flag.</p>
+          <h3>Install it and point it at staging</h3>
+          <p>There's no installer during the alpha. With <a href="https://go.dev/dl/">Go</a> 1.21 or newer installed (it fetches the newer Go it needs by itself):</p>
+          <figure class="terminal">
+            <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>Terminal</figcaption>
+<pre><code><span class="c"># install</span>
+<span class="p">$ </span>go install github.com/gremlin-technologies/mailgoose/cmd/mailgoose@latest
+
+<span class="c"># the CLI talks to production unless told otherwise</span>
+<span class="p">$ </span>mailgoose config set api-url https://api.staging.mailgoose.app
+<span class="p">$ </span>mailgoose status
+
+<span class="c"># sign in: it prints a code, you approve it in the browser</span>
+<span class="p">$ </span>mailgoose login
+<span class="p">$ </span>mailgoose whoami</code></pre>
+          </figure>
+          <p>If your shell can't find <code>mailgoose</code> afterwards, add Go's bin folder to your <code>PATH</code> (usually <code>~/go/bin</code>).</p>
+          <h3>Commands to try</h3>
+          <figure class="terminal">
+            <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>Terminal</figcaption>
+<pre><code><span class="p">$ </span>mailgoose account get                 <span class="c"># what's still needed before you can send</span>
+<span class="p">$ </span>mailgoose email create --name "Hello"
+<span class="p">$ </span>mailgoose email blocks add &lt;email-id&gt; --type heading --text "Hi {{first_name|there}}"
+<span class="p">$ </span>mailgoose email check &lt;email-id&gt;
+<span class="p">$ </span>mailgoose email preview &lt;email-id&gt; --out preview.html
+<span class="p">$ </span>mailgoose campaign create --name "Hello" --email &lt;email-id&gt; --all
+<span class="p">$ </span>mailgoose campaign test &lt;campaign-id&gt;
+<span class="p">$ </span>mailgoose campaign launch &lt;campaign-id&gt;   <span class="c"># prints a summary and a code</span>
+<span class="p">$ </span>mailgoose campaign launch &lt;campaign-id&gt; --confirm &lt;code&gt;
+<span class="p">$ </span>mailgoose campaign report &lt;campaign-id&gt;
+<span class="p">$ </span>mailgoose commands --json            <span class="c"># every command</span></code></pre>
+          </figure>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>Whatever you build in the CLI shows up in the web app straight away, and the other way round.</li>
+              <li>Every command's <code>--help</code> has an example you can copy, and errors tell you what to do next.</li>
+              <li>With <code>--json</code>, output is valid JSON and errors go to stderr with a <code>code</code>.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>Commands with a missing argument, a wrong id, and no network.</li>
+              <li>A launch code used twice, a wrong one, and one older than 15 minutes.</li>
+              <li><code>mailgoose logout</code>, then any command.</li>
+              <li>Exit codes in a script: 0 ok, 1 error, 2 bad usage, 3 not signed in, 4 not found, 5 needs a confirmation (<code>mailgoose help exit-codes</code>).</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="agents" aria-labelledby="agents-h">
+          <p class="eyebrow">Area 13</p>
+          <h2 id="agents-h">Using it from an AI agent</h2>
+          <p>This is the part we most want feedback on. Any agent that can run commands (Claude Code, Codex, Cursor, or your own) can build and send email through the CLI. An agent can do everything up to the launch; a campaign only goes out once you've seen the launch summary and said yes in your chat.</p>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Make a <strong>draft</strong> API key and give it to the agent as environment variables, so it doesn't need to sign in through a browser:
+                <figure class="terminal">
+                  <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>Terminal</figcaption>
+<pre><code><span class="p">$ </span>export MAILGOOSE_API_URL=https://api.staging.mailgoose.app
+<span class="p">$ </span>export MAILGOOSE_API_KEY=&lt;your draft key&gt;</code></pre>
+                </figure>
+              </li>
+              <li>Tell the agent to read the guide written for it: <code>mailgoose docs</code> prints it.</li>
+              <li>Ask for something real, in plain words. For example: "Build a short email announcing our holiday hours, with a button to our website, and send me a test."</li>
+              <li>Then try a full key and ask it to launch the campaign to one tag.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>The agent gets to a good-looking test without you having to explain mailgoose to it.</li>
+              <li>With a draft key, it stops after the test and asks you to launch in the web app.</li>
+              <li>With a full key, it shows you the launch summary and waits for your yes before it confirms.</li>
+            </ul>
+          </div>
+          <div class="part edge">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Edge cases worth poking at</h3>
+            <ul>
+              <li>Ask it to "just send it" without showing you anything. Tell us if it ever launches without your yes.</li>
+              <li>Edit the email in the web app while the agent is working on it.</li>
+              <li>Ask it to import a list and see whether it asks you where the people came from (it should; it can't guess).</li>
+            </ul>
+          </div>
+          <div class="callout warn">
+            <p>Keep keys out of chat logs you share and out of code you commit. Revoke a key as soon as you're done with it.</p>
+          </div>
+        </section>
+
+        <section id="billing" aria-labelledby="billing-h">
+          <p class="eyebrow">Area 14</p>
+          <h2 id="billing-h">Credits and billing</h2>
+          <p class="where">Where: Credits and billing, and <code>mailgoose credits</code> / <code>plan</code></p>
+          <p>Each email sent uses one credit. The page shows your plan, your balance and its history. You don't need to buy anything to test: your tester credits cover your sends.</p>
+          <div class="callout stop">
+            <p><strong>Never enter a real card on staging.</strong> Buying credits and the paid plan may say billing isn't set up yet, or run in a payment test mode. Either way, no real money should change hands here; if anything asks for a real payment, stop and tell us.</p>
+          </div>
+          <div class="part">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>How to test it</h3>
+            <ol>
+              <li>Send a test and a small campaign, then check the history shows each one.</li>
+              <li>Compare <code>mailgoose credits</code> with the page.</li>
+            </ol>
+          </div>
+          <div class="part good">
+            <h3><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>What good looks like</h3>
+            <ul>
+              <li>Every credit used is explained in the history, and copies that failed give theirs back.</li>
+              <li>The tester banner's count goes down as you send.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="coming-soon" aria-labelledby="coming-soon-h">
+          <h2 id="coming-soon-h">Coming soon</h2>
+          <p>These are planned but not on staging yet, so there's nothing to test. We'll tell you when they land.</p>
+          <ul>
+            <li><strong>Import from Mailchimp</strong> <span class="soon">Coming soon</span>: bring your audiences, tags and email designs over in one go, from Mailchimp's export file and later by connecting your account. Until then, a Mailchimp audience CSV already imports through <a href="#imports">Importing contacts</a>.</li>
+            <li><strong>The shared sending domain on staging</strong> <span class="soon">Rolling out</span>: sending without a domain of your own, as described in <a href="#sending-from">Where your email comes from</a>.</li>
+            <li><strong>A one-step CLI installer</strong> <span class="soon">Coming soon</span>: until then, use <code>go install</code>.</li>
+          </ul>
+        </section>
+
+        <section id="bugs" aria-labelledby="bugs-h">
+          <h2 id="bugs-h">Reporting a bug</h2>
+          <p><strong>Post it in the <code>#user-feedback</code> channel of the mailgoose team Slack.</strong> Your invite includes access to the Slack. One message per bug is easiest for us to follow, and we'll reply in its thread.</p>
+          <p>A good report has:</p>
+          <ol>
+            <li><strong>Steps to make it happen</strong>, starting from which page or command, and which area of this guide it was.</li>
+            <li><strong>What you expected</strong>, and <strong>what happened instead</strong>.</li>
+            <li><strong>Your account's email address</strong>, so we can find your account.</li>
+            <li><strong>Where:</strong> your browser and device for the web app, or for the CLI the command you ran and what <code>mailgoose version</code> prints.</li>
+            <li><strong>A screenshot</strong>, or the CLI's output with <code>--json</code>. The error's <code>code</code> helps us most.</li>
+            <li><strong>When</strong> it happened, roughly, with your time zone.</li>
+          </ol>
+          <div class="callout warn">
+            <p>Before you send a screenshot or output, cover up any API key, sign-in code or confirmation link. We'll never ask you for them.</p>
+          </div>
+          <p>Ideas, confusing wording and "I expected this to be here" are just as welcome in <code>#user-feedback</code> as bugs. If something looks like it could expose another account's data or let mail go out without a confirmation, don't post the details in the channel: send them as a direct message to the person who invited you, straight away, and don't try it further.</p>
+        </section>
+
+        <section id="please-dont" aria-labelledby="please-dont-h">
+          <h2 id="please-dont-h">Please don't</h2>
+          <ul class="dont">
+            <li><strong>Upload real customer lists.</strong> Use your own addresses, colleagues who've agreed, and the simulator.</li>
+            <li><strong>Send to anyone who didn't opt in</strong>, and no bulk sends, even within your credits. Real complaints on staging hurt delivery for everyone testing with you.</li>
+            <li><strong>Import bought, rented, shared or scraped lists</strong>, or addresses copied from somewhere else.</li>
+            <li><strong>Enter a real card or payment details.</strong></li>
+            <li><strong>Send anything you wouldn't send as a real business:</strong> no phishing look-alikes, no fake invoices, nothing that pretends to be another company. Our <a href="/anti-spam/">anti-spam policy</a> applies on staging too.</li>
+            <li><strong>Load-test or attack staging.</strong> If you'd like to try security or load testing, ask us first and we'll set it up.</li>
+            <li><strong>Share your access or this guide</strong> beyond the people we invited.</li>
+          </ul>
+          <p>Thank you for testing. Every report makes mailgoose better for the small businesses and developers it's for.</p>
+          <a class="to-top" href="#main">Back to the top</a>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>&copy; 2026 Gremlin Technologies LLC. mailgoose is a Gremlin Technologies product.</p>
+      <ul aria-label="Policies">
+        <li><a href="/terms/">Terms of service</a></li>
+        <li><a href="/privacy/">Privacy policy</a></li>
+        <li><a href="/anti-spam/">Anti-spam policy</a></li>
+        <li><a href="/dpa/">Data processing agreement</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Progressive enhancement only: the page works without it.
+    (function () {
+      var toc = document.querySelector(".toc");
+      var narrow = window.matchMedia("(max-width: 960px)");
+      // On a phone the table of contents starts folded; picking a link folds it again.
+      function fit() { if (narrow.matches) toc.removeAttribute("open"); else toc.setAttribute("open", ""); }
+      fit();
+      narrow.addEventListener("change", fit);
+      toc.addEventListener("click", function (e) {
+        if (e.target.closest("a") && narrow.matches) toc.removeAttribute("open");
+      });
+
+      // Mark the section being read in the table of contents.
+      if (!("IntersectionObserver" in window)) return;
+      var links = {};
+      toc.querySelectorAll('a[href^="#"]').forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });
+      var current;
+      var seen = new Set();
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) seen.add(e.target.id); else seen.delete(e.target.id); });
+        var first = Array.prototype.find.call(document.querySelectorAll(".content > section"), function (s) { return seen.has(s.id); });
+        if (!first || first.id === current) return;
+        if (current && links[current]) links[current].removeAttribute("aria-current");
+        current = first.id;
+        if (links[current]) links[current].setAttribute("aria-current", "true");
+      }, { rootMargin: "-80px 0px -60% 0px" });
+      document.querySelectorAll(".content > section").forEach(function (s) { io.observe(s); });
+    })();
+  </script>
+</body>
+</html>

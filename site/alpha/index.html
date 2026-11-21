@@ -664,13 +664,26 @@
           <p class="where">Where: your terminal, on macOS, Linux or Windows</p>
           <p>Every action in the web app has a <code>mailgoose</code> command. Add <code>--json</code> to any of them for output a script or an agent can read. Nothing prompts: anything that sends or deletes waits for an explicit flag.</p>
           <h3>Install it and point it at staging</h3>
-          <p>There's no installer during the alpha. With <a href="https://go.dev/dl/">Go</a> 1.21 or newer installed (it fetches the newer Go it needs by itself):</p>
+          <p>Install it with your package manager:</p>
           <figure class="terminal">
             <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>Terminal</figcaption>
-<pre><code><span class="c"># install</span>
-<span class="p">$ </span>go install github.com/gremlin-technologies/mailgoose/cmd/mailgoose@latest
+<pre><code><span class="c"># macOS or Linux, with Homebrew (run brew update first on an older install)</span>
+<span class="p">$ </span>brew install gremlin-technologies/tap/mailgoose
 
-<span class="c"># the CLI talks to production unless told otherwise</span>
+<span class="c"># Debian or Ubuntu (use _arm64 on ARM)</span>
+<span class="p">$ </span>curl -fsSLO https://github.com/gremlin-technologies/mailgoose-public/releases/latest/download/mailgoose_linux_amd64.deb
+<span class="p">$ </span>sudo apt install ./mailgoose_linux_amd64.deb
+
+<span class="c"># Fedora (use _arm64 on ARM)</span>
+<span class="p">$ </span>sudo dnf install https://github.com/gremlin-technologies/mailgoose-public/releases/latest/download/mailgoose_linux_amd64.rpm
+
+<span class="c"># check it</span>
+<span class="p">$ </span>mailgoose version</code></pre>
+          </figure>
+          <p>On Windows, download <code>mailgoose_windows_amd64.zip</code> from the <a href="https://github.com/gremlin-technologies/mailgoose-public/releases/latest">latest release</a> and put <code>mailgoose.exe</code> on your <code>PATH</code>. On Arch, use the Linux .tar.gz from the same page until the AUR package is up. Then point it at staging:</p>
+          <figure class="terminal">
+            <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>Terminal</figcaption>
+<pre><code><span class="c"># the CLI talks to production unless told otherwise</span>
 <span class="p">$ </span>mailgoose config set api-url https://api.staging.mailgoose.app
 <span class="p">$ </span>mailgoose status
 
@@ -783,7 +796,7 @@
           <ul>
             <li><strong>Import from Mailchimp</strong> <span class="soon">Coming soon</span>: bring your audiences, tags and email designs over in one go, from Mailchimp's export file and later by connecting your account. Until then, a Mailchimp audience CSV already imports through <a href="#imports">Importing contacts</a>.</li>
             <li><strong>The shared sending domain on staging</strong> <span class="soon">Rolling out</span>: sending without a domain of your own, as described in <a href="#sending-from">Where your email comes from</a>.</li>
-            <li><strong>Installing the CLI with a package manager</strong> <span class="soon">Coming soon</span>: Homebrew on macOS and Linux, pacman (through the AUR) on Arch, and .deb and .rpm packages for apt and dnf. Until then, use <code>go install</code>, as in <a href="#cli">The CLI</a>.</li>
+            <li><strong>Installing the CLI with pacman</strong> <span class="soon">Coming soon</span>: an AUR package (<code>mailgoose-bin</code>) for Arch. Until then, use the Linux download, as in <a href="#cli">The CLI</a>.</li>
           </ul>
         </section>
 

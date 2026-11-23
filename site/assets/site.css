@@ -94,6 +94,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospac
   font-weight: 500;
   color: var(--muted);
 }
+.site-header nav a[aria-current="page"] { color: var(--text); }
 .site-header nav a:hover { color: var(--text); background: var(--surface-hover); text-decoration: none; }
 
 /* Buttons: the app's .button and .button.primary, a size up for a landing page. */
@@ -343,6 +344,58 @@ h3 { font-size: 1rem; line-height: 1.4; letter-spacing: -0.01em; margin: 0 0 0.3
 }
 
 /* Small screens */
+
+/* Pricing page (/pricing/) */
+.hero-short { padding: 4rem 0 3rem; }
+.hero-short .lede { margin: 0; max-width: 46rem; }
+.plan .price-note { margin: -0.5rem 0 0.75rem; }
+.checks { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.5rem; font-size: 0.9375rem; color: var(--muted); }
+.checks li { position: relative; padding-left: 1.5rem; }
+.checks li::before {
+  content: "";
+  position: absolute;
+  left: 0.125rem;
+  top: 0.4em;
+  width: 0.75rem;
+  height: 0.4rem;
+  border-left: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(-45deg);
+}
+.table-wrap { overflow-x: auto; max-width: 36rem; }
+.packs {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.packs th, .packs td { padding: 0.75rem 1.25rem; text-align: right; border-top: 1px solid var(--border); }
+.packs th:first-child { text-align: left; }
+.packs thead th { border-top: 0; background: var(--surface-subtle); color: var(--muted); font-weight: 500; font-size: 0.875rem; }
+.packs thead th:first-child { border-top-left-radius: var(--radius-lg); }
+.packs thead th:last-child { border-top-right-radius: var(--radius-lg); }
+.packs tbody th { font-weight: 600; color: var(--text); }
+.packs td { color: var(--muted); }
+.steps h3 { margin-top: 0; }
+.steps ol { margin: 0 0 1.75rem; padding-left: 1.25rem; color: var(--muted); display: grid; gap: 0.375rem; }
+.steps ol strong { color: var(--text); font-weight: 600; }
+.example dl { margin: 1rem 0 0; display: grid; gap: 0.375rem; font-size: 0.9375rem; }
+.example dl div { display: flex; justify-content: space-between; gap: 1rem; }
+.example dt { color: var(--muted); }
+.example dd { margin: 0; text-align: right; color: var(--text); }
+.example .total { padding-top: 0.5rem; border-top: 1px solid var(--border); font-weight: 600; }
+.example .total dt { color: var(--text); }
+.faq { margin: 1.5rem 0 0; max-width: 46rem; }
+.faq dt { font-weight: 600; color: var(--text); margin-top: 1.5rem; }
+.faq dt:first-child { margin-top: 0; }
+.faq dd { margin: 0.375rem 0 0; color: var(--muted); }
+.pricing-more { margin: 1.5rem 0 0; }
+
 @media (max-width: 860px) {
   .hero { padding: 2.5rem 0 3.5rem; }
   .hero .wrap, .split { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -355,6 +408,10 @@ h3 { font-size: 1rem; line-height: 1.4; letter-spacing: -0.01em; margin: 0 0 0.3
 
 @media (max-width: 600px) {
   .wrap { padding: 0 1rem; }
+  .hero-short { padding: 2.5rem 0 2rem; }
+  .packs th, .packs td { padding: 0.625rem 0.75rem; }
+  .example dl div { flex-direction: column; gap: 0; }
+  .example dd { text-align: left; }
   .grid, .grid-2 { grid-template-columns: 1fr; }
   .site-header nav a { padding: 0.375rem 0.5rem; }
   .policy { padding: 2.5rem 1rem 3.5rem; }

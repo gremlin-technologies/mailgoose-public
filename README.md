@@ -15,6 +15,7 @@ Everything under `site/` is published as-is; its folders are the site's URLs.
 | Path | URL | Notes |
 | --- | --- | --- |
 | `site/index.html` | `/` | The landing page. |
+| `site/pricing/` | `/pricing/` | The pricing page. Its numbers come from the app (`DefaultPacks`, `PLAN_PRICES`, the free tier); change them there first. |
 | `site/404.html` | any unknown path | |
 | `site/terms/`, `site/privacy/`, `site/anti-spam/`, `site/dpa/` | `/terms/` and so on | **Generated** from the app's policy pages. Don't edit by hand. |
 | `site/alpha/` | `/alpha/` | The alpha tester guide. Hand-written, unlisted (nothing links to it, `noindex`), linked from tester invites. It documents only what's live; move items out of "Coming soon" as they ship. |

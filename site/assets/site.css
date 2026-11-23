@@ -269,6 +269,13 @@ h3 { font-size: 1rem; line-height: 1.4; letter-spacing: -0.01em; margin: 0 0 0.3
 }
 .terminal .c { color: var(--muted); }
 .terminal .p { color: var(--accent); user-select: none; }
+/* The home page's agent example: the whole width, with the chat lines
+   (You:, Agent:) set apart from the commands. */
+.terminal-wide pre { font-size: 0.8125rem; }
+.terminal .who { font-weight: 600; color: var(--accent-soft-text); }
+
+/* The line on deliverability under the feature cards. */
+.features-note { margin: 2rem 0 0; max-width: 46rem; color: var(--muted); font-size: 0.9375rem; }
 
 /* Pricing: the app's tiles, larger. */
 .plan .price {

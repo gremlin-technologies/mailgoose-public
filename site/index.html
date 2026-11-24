@@ -72,44 +72,27 @@
       <div class="wrap">
         <div class="section-head">
           <h2>Let your AI agent do the busywork</h2>
-          <p class="section-lede">Ask your agent for an email, and it builds one with the mailgoose command line, checks it and sends you a test. Before anything goes to your list, it shows you a summary and waits for your yes. Here's what that looks like.</p>
+          <p class="section-lede">Describe the email you want. Your agent writes it in HTML, makes it with the mailgoose command line and sends you a test. Nothing goes to your list until you say yes.</p>
         </div>
         <figure class="terminal terminal-wide">
           <figcaption class="terminal-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>You and your agent</figcaption>
 <pre><code><span class="who">You:</span> Make a spring menu email for my regulars and send me a test.
 
-<span class="p">$ </span>mailgoose email create --name "Spring menu"
-Created "Spring menu" (5492d15a-1ec7-4eb6-885c-8c8b4465b9c9), version 1.
-<span class="p">$ </span>mailgoose email blocks add 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 --type heading --text "Spring is here"
-Added heading block b_fttuowpxol at 1. The email is at version 2.
-<span class="p">$ </span>mailgoose email blocks add 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 --type text --text "Hot cross buns are back from Monday, {{first_name|friend}}."
-Added text block b_kqzmrwahve at 2. The email is at version 3.
-<span class="p">$ </span>mailgoose email blocks add 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 --type button --text "See the menu" --href https://patsbakery.com/menu
-Added button block b_jnyeoctsli at 3. The email is at version 4.
-<span class="p">$ </span>mailgoose email update 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 --subject "Our spring menu is here"
-Updated "Spring menu" (5492d15a-1ec7-4eb6-885c-8c8b4465b9c9), version 5.
-<span class="p">$ </span>mailgoose email check 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9
-No problems found.
+<span class="who">Agent:</span> I wrote it as spring.html: a headline, a line that hot cross buns are back, and a button to the menu.
 
+<span class="p">$ </span>mailgoose email create --name "Spring menu" --kind html
+Created "Spring menu" (5492d15a-1ec7-4eb6-885c-8c8b4465b9c9), version 1.
+<span class="p">$ </span>mailgoose email import-html 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 spring.html
+Imported 4.1 KB of HTML into "Spring menu" (5492d15a-1ec7-4eb6-885c-8c8b4465b9c9), version 2.
+<span class="p">$ </span>mailgoose email update 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 --subject "Our spring menu is here"
+Updated "Spring menu" (5492d15a-1ec7-4eb6-885c-8c8b4465b9c9), version 3.
 <span class="p">$ </span>mailgoose campaign create --name "Spring menu" --email 5492d15a-1ec7-4eb6-885c-8c8b4465b9c9 --tag regulars
 Created campaign "Spring menu" (ac80c1d4-dc0a-4fc4-8733-0efe17feeada), version 1.
 <span class="p">$ </span>mailgoose campaign test ac80c1d4-dc0a-4fc4-8733-0efe17feeada
 Sent a test of "Spring menu" to pat@patsbakery.com.
 1 of 50 test emails used in the last 24 hours.
-<span class="p">$ </span>mailgoose campaign launch ac80c1d4-dc0a-4fc4-8733-0efe17feeada
-Campaign:  Spring menu
-Subject:   Our spring menu is here
-From:      Pat's Bakery &lt;hello@patsbakery.com&gt;
-To:        412 contacts
-Sends:     as soon as it's launched
-Credits:   412 of 2500
-Confirmation code: K7QM-2PXD
 
-<span class="who">Agent:</span> The test is in your inbox. Sending it goes to 412 of your regulars and uses 412 credits. Go ahead?
-<span class="who">You:</span> Yes, send it.
-
-<span class="p">$ </span>mailgoose campaign launch ac80c1d4-dc0a-4fc4-8733-0efe17feeada --confirm K7QM-2PXD
-Launched "Spring menu" to 412 contacts, with 412 credits reserved. It's sending now.</code></pre>
+<span class="who">Agent:</span> The test is in your inbox. Should I send it to your 412 regulars? That uses 412 credits.</code></pre>
         </figure>
       </div>
     </section>
